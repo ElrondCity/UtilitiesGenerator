@@ -208,9 +208,9 @@ def main():
         force = True
 
 
-    # Checks if README.md or interaction.sh already exist
-    if not force and (os.path.exists("README.md") or os.path.exists("interaction.sh")):
-        print("README.md or interaction.sh already exist. Please rename them and run again, or use the --force flag to overwrite them.")
+    # Checks if contract_doc.md or interaction.sh already exist
+    if not force and (os.path.exists("contract_doc.md") or os.path.exists("interaction.sh")):
+        print("contract_doc.md or interaction.sh already exist. Please rename them and run again, or use the --force flag to overwrite them.")
         return
 
 
