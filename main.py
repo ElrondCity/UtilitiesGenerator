@@ -95,6 +95,11 @@ def generate_interaction_script(data):
 
         f.write("# Standard deploy command. Provide any constructor arguments as needed (e.g deploy 12 TOKEN-123456). Numbers are automatically scaled to 18 decimals. (e.g. 12 -> 12000000000000000000)\n")
         f.write("deploy() {\n")
+        if (data["constructor"]["inputs"]):
+                args_str = "# Arguments: \n"
+                for i, input in enumerate(data["constructor"]["inputs"]):
+                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                f.write(args_str)
         f.write("    erdpy contract build\n")
         deploy_str = "    erdpy contract deploy --bytecode=\"../output/" + contract_name + ".wasm\" --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send --outfile=\"deploy.interaction.json\""
         if (data["constructor"]["inputs"]):
@@ -115,6 +120,11 @@ def generate_interaction_script(data):
         # Upgrade
         f.write("# Standard upgrade command. Provide any constructor arguments as needed (e.g upgrade 12 TOKEN-123). Numbers are automatically scaled to 18 decimals. (e.g. 12 -> 12000000000000000000)\n")
         f.write("upgrade() {\n")
+        if (data["constructor"]["inputs"]):
+                args_str = "# Arguments: \n"
+                for i, input in enumerate(data["constructor"]["inputs"]):
+                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                f.write(args_str)
         upgrade_str = "    erdpy contract upgrade ${ADDRESS} --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send"
         if (data["constructor"]["inputs"]):
             upgrade_str += " --arguments "
@@ -137,6 +147,11 @@ def generate_interaction_script(data):
             if endpoint["mutability"] == "readonly":
                 continue
             f.write(endpoint["name"] + "() {\n")
+            if (endpoint["inputs"]):
+                args_str = "# Arguments: \n"
+                for i, input in enumerate(endpoint["inputs"]):
+                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                f.write(args_str)
             call_str = "    erdpy contract call ${ADDRESS} \\\n"
             call_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
             call_str += tab_str + tab_str + "--recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send \\\n"
@@ -159,6 +174,11 @@ def generate_interaction_script(data):
             if endpoint["mutability"] != "readonly":
                 continue
             f.write(endpoint["name"] + "() {\n")
+            if (endpoint["inputs"]):
+                args_str = "# Arguments: \n"
+                for i, input in enumerate(endpoint["inputs"]):
+                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                f.write(args_str)
             query_str = "    erdpy contract query ${ADDRESS} \\\n"
             query_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
             query_str += tab_str + tab_str + "--proxy=${PROXY} --chain=${CHAIN_ID} \\\n"
