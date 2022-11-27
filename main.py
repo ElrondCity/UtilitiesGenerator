@@ -1,7 +1,7 @@
 '''
 This script reads the ABI file given as input and generates a Markdown file with the ABI documentation.
 
-The ABI file is expected to be in JSON format. The Markdown file is generated in the same directory as the ABI file.
+The ABI file is expected to be in JSON format. The Markdown file is generated in the same directory as the script.
 
 Example usage:
     python3 main.py /path/to/abi/file.json
@@ -14,7 +14,7 @@ import sys
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 generate_doc.py <path_to_json>")
+        print("Usage: python3 main.py <path_to_json>")
         return
 
     with open(sys.argv[1]) as f:
