@@ -157,9 +157,20 @@ def generate_interaction_script(data):
 
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
         print("Usage: python3 main.py <path_to_json>")
         return
+
+    force = False
+    if (len(sys.argv) == 3) and (sys.argv[2] == "--force" or sys.argv[2] == "-f"):
+        force = True
+
+
+    # Checks if README.md or interaction.sh already exist
+    if not force and (os.path.exists("README.md") or os.path.exists("interaction.sh")):
+        print("README.md or interaction.sh already exist. Please rename them and run again, or use the --force flag to overwrite them.")
+        return
+
 
     with open(sys.argv[1]) as f:
         data = json.load(f)
