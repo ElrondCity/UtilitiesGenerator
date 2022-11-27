@@ -46,11 +46,11 @@ def main():
 
         f.write('\n')
 
-        # Then write the public endpoints
+        # Then write the public and not readonly endpoints
         f.write(" ### Public ")
         f.write('\n')
         for endpoint in data["endpoints"]:
-            if "onlyOwner" not in endpoint or not endpoint["onlyOwner"]:
+            if ("onlyOwner" not in endpoint or not endpoint["onlyOwner"]) and endpoint["mutability"] != "readonly":
                 endpoint_str = "- **" + endpoint["name"] + "**("
                 for i, input in enumerate(endpoint["inputs"]):
                     endpoint_str += input["name"] + ": `" + input["type"] + "`"
