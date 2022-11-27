@@ -81,8 +81,8 @@ def generate_interaction_script(data):
     # Create the interaction script
     with open("interaction.sh", "w") as f:
         f.write("# Replace the following with your own values\n")
-        f.write("ADDRESS=\"\erd1qqq...xxx\"\n")
-        f.write("OWNER=\"\erd1...xxx\"\n")
+        f.write("ADDRESS=\"erd1qqq...xxx\"\n")
+        f.write("OWNER=\"erd1...xxx\"\n")
         f.write("# Place your keystore file in the same directory as this script and replace the following with the name of the file\n")
         f.write("# Optionally, you can also put your password in the .passfile in the same directory as this script (if not, you will be prompted for the password)\n")
         f.write("PRIVATE_KEY=\"(--keyfile=erd1...xxx.json --passfile=.passfile)\"\n")
@@ -103,7 +103,7 @@ def generate_interaction_script(data):
         f.write("    erdpy contract build\n")
         deploy_str = "    erdpy contract deploy --bytecode=\"../output/" + contract_name + ".wasm\" --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send --outfile=\"deploy.interaction.json\""
         if (data["constructor"]["inputs"]):
-            deploy_str += " --arguments "
+            deploy_str += "--arguments "
             for i, input in enumerate(data["constructor"]["inputs"]):
                 if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                     deploy_str += "str:${" + str(i) + "} "
@@ -127,7 +127,7 @@ def generate_interaction_script(data):
                 f.write(args_str)
         upgrade_str = "    erdpy contract upgrade ${ADDRESS} --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send"
         if (data["constructor"]["inputs"]):
-            upgrade_str += " --arguments "
+            upgrade_str += "--arguments "
             for i, input in enumerate(data["constructor"]["inputs"]):
                 if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                     upgrade_str += "str:${" + str(i) + "} "
@@ -142,7 +142,7 @@ def generate_interaction_script(data):
         tab_str = "    "
 
         # Call endpoints
-        f.write("# All contract endpoints are available as functions. Provide any arguments as needed (e.g transfer 12 TOKEN-123\n\n")
+        f.write("# All contract endpoints are available as functions. Provide any arguments as needed (e.g transfer 12 TOKEN-123)\n\n")
         for endpoint in data["endpoints"]:
             if endpoint["mutability"] == "readonly":
                 continue
@@ -156,7 +156,7 @@ def generate_interaction_script(data):
             call_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
             call_str += tab_str + tab_str + "--recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send \\\n"
             if (endpoint["inputs"]):
-                call_str += tab_str + tab_str + " --arguments "
+                call_str += tab_str + tab_str + "--arguments "
                 for i, input in enumerate(endpoint["inputs"]):
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                         call_str += "str:${" + str(i) + "} "
