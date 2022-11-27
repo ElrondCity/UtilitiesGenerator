@@ -132,10 +132,10 @@ def generate_interaction_script(data):
         tab_str = "    "
 
         # Call endpoints
+        f.write("# All contract endpoints are available as functions. Provide any arguments as needed (e.g transfer 12 TOKEN-123\n\n")
         for endpoint in data["endpoints"]:
             if endpoint["mutability"] == "readonly":
                 continue
-            f.write("# " + endpoint["name"] + " endpoint call command. Provide any arguments as needed\n")
             f.write(endpoint["name"] + "() {\n")
             call_str = "    erdpy contract call ${ADDRESS} \\\n"
             call_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
@@ -151,6 +151,28 @@ def generate_interaction_script(data):
                         call_str += "${" + str(i) + "} "
                 call_str += "\n"
             f.write(call_str)
+            f.write("}\n\n")
+
+        # Query endpoints
+        f.write("# All contract views. Provide arguments as needed (e.g balanceOf 0x1234567890123456789012345678901234567890)\n\n")
+        for endpoint in data["endpoints"]:
+            if endpoint["mutability"] != "readonly":
+                continue
+            f.write(endpoint["name"] + "() {\n")
+            query_str = "    erdpy contract query ${ADDRESS} \\\n"
+            query_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
+            query_str += tab_str + tab_str + "--proxy=${PROXY} --chain=${CHAIN_ID} \\\n"
+            if (endpoint["inputs"]):
+                query_str += tab_str + tab_str + " --arguments "
+                for i, input in enumerate(endpoint["inputs"]):
+                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
+                        query_str += "str:${" + str(i) + "} "
+                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                        query_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    else:
+                        query_str += "${" + str(i) + "} "
+                query_str += "\n"
+            f.write(query_str)
             f.write("}\n\n")
 
 
