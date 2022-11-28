@@ -80,12 +80,12 @@ def generate_markdown(data):
 def generate_interaction_script(data):
     # Create the interaction script
     with open("interaction.sh", "w") as f:
-        f.write("# Replace the following with your own values\n")
+        f.write("# Replace the following with your own values (You need to run the script once to get the contract address)\n")
         f.write("ADDRESS=\"erd1qqq...xxx\"\n")
         f.write("OWNER=\"erd1...xxx\"\n")
         f.write("# Place your keystore file in the same directory as this script and replace the following with the name of the file\n")
         f.write("# Optionally, you can also put your password in the .passfile in the same directory as this script (if not, you will be prompted for the password)\n")
-        f.write("PRIVATE_KEY=\"(--keyfile=erd1...xxx.json --passfile=.passfile)\"\n")
+        f.write("PRIVATE_KEY=(--keyfile=erd1...xxx.json --passfile=.passfile)\n")
         f.write("PROXY=https://devnet-api.elrond.com\n")
         f.write("CHAIN_ID=D\n")
         f.write("\n")
@@ -98,22 +98,30 @@ def generate_interaction_script(data):
         if (data["constructor"]["inputs"]):
                 args_str = "# Arguments: \n"
                 for i, input in enumerate(data["constructor"]["inputs"]):
-                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                    args_str += "ARG_" + str(i) + "="
+                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
+                        args_str += "str:${" + str(i) + "} "
+                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    else:
+                        args_str += "${" + str(i) + "} "
+                    args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
         f.write("    erdpy contract build\n")
-        deploy_str = "    erdpy contract deploy --bytecode=\"../output/" + contract_name + ".wasm\" --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send --outfile=\"deploy.interaction.json\""
+        deploy_str = "    erdpy contract deploy --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --keyfile ${OWNER}.json --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send --outfile=\"deploy.interaction.json\" "
         if (data["constructor"]["inputs"]):
-            deploy_str += "--arguments "
+            deploy_str += "\\\n" + tab_str + tab_str + "--arguments "
             for i, input in enumerate(data["constructor"]["inputs"]):
                 if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                     deploy_str += "str:${" + str(i) + "} "
                 elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
                     deploy_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
                 else:
-                    deploy_str += "${" + str(i) + "} "
+                    deploy_str += "${ARG_" + str(i) + "} "
             deploy_str += "\n"
+        deploy_str += "\n"
         f.write(deploy_str)
-        f.write("    echo \"Deployed contract at address: $(cat deploy.interaction.json | jq -r '.emitted_tx.contract_address')\"\n")
+        f.write("    echo \"Deployed contract at the address written above.\"")
         f.write("    echo \"Pleade update the ADDRESS variable in this script with the address of the deployed contract, then run 'source interaction.sh' to update the environment variables.\"\n")
         f.write("}\n\n")
 
@@ -123,19 +131,22 @@ def generate_interaction_script(data):
         if (data["constructor"]["inputs"]):
                 args_str = "# Arguments: \n"
                 for i, input in enumerate(data["constructor"]["inputs"]):
-                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                    args_str += "ARG_" + str(i) + "="
+                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
+                        args_str += "str:${" + str(i) + "} "
+                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    else:
+                        args_str += "${" + str(i) + "} "
+                    args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
-        upgrade_str = "    erdpy contract upgrade ${ADDRESS} --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send"
+        upgrade_str = "    erdpy contract upgrade ${ADDRESS} --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send "
         if (data["constructor"]["inputs"]):
-            upgrade_str += "--arguments "
-            for i, input in enumerate(data["constructor"]["inputs"]):
-                if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                    upgrade_str += "str:${" + str(i) + "} "
-                elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                    upgrade_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
-                else:
-                    upgrade_str += "${" + str(i) + "} "
+            upgrade_str += "\\\n" + tab_str + tab_str + "--arguments "
+            for i in enumerate(data["constructor"]["inputs"]).len():
+                upgrade_str += "${ARG_" + str(i) + "} "
             upgrade_str += "\n"
+        upgrade_str += "\n"
         f.write(upgrade_str)
         f.write("}\n\n")
 
@@ -150,21 +161,24 @@ def generate_interaction_script(data):
             if (endpoint["inputs"]):
                 args_str = "# Arguments: \n"
                 for i, input in enumerate(endpoint["inputs"]):
-                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                    args_str += "ARG_" + str(i) + "="
+                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
+                        args_str += "str:${" + str(i) + "} "
+                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    else:
+                        args_str += "${" + str(i) + "} "
+                    args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
             call_str = "    erdpy contract call ${ADDRESS} \\\n"
-            call_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
             call_str += tab_str + tab_str + "--recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send \\\n"
+            call_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" "
             if (endpoint["inputs"]):
-                call_str += tab_str + tab_str + "--arguments "
+                call_str += "\\\n" + tab_str + tab_str + "--arguments "
                 for i, input in enumerate(endpoint["inputs"]):
-                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        call_str += "str:${" + str(i) + "} "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        call_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
-                    else:
-                        call_str += "${" + str(i) + "} "
+                    call_str += "${ARG_" + str(i) + "} "
                 call_str += "\n"
+            call_str += "\n"
             f.write(call_str)
             f.write("}\n\n")
 
@@ -177,21 +191,24 @@ def generate_interaction_script(data):
             if (endpoint["inputs"]):
                 args_str = "# Arguments: \n"
                 for i, input in enumerate(endpoint["inputs"]):
-                    args_str += "# " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
+                    args_str += "ARG_" + str(i) + "="
+                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
+                        args_str += "str:${" + str(i) + "} "
+                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    else:
+                        args_str += "${" + str(i) + "} "
+                    args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
             query_str = "    erdpy contract query ${ADDRESS} \\\n"
             query_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
-            query_str += tab_str + tab_str + "--proxy=${PROXY} --chain=${CHAIN_ID} \\\n"
+            query_str += tab_str + tab_str + "--proxy=${PROXY} --chain=${CHAIN_ID} "
             if (endpoint["inputs"]):
-                query_str += tab_str + tab_str + " --arguments "
+                query_str += "\\\n" + tab_str + tab_str + " --arguments "
                 for i, input in enumerate(endpoint["inputs"]):
-                    if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        query_str += "str:${" + str(i) + "} "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        query_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
-                    else:
-                        query_str += "${" + str(i) + "} "
+                    query_str += "${ARG_" + str(i) + "} "
                 query_str += "\n"
+            query_str += "\n"
             f.write(query_str)
             f.write("}\n\n")
 
