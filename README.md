@@ -10,7 +10,7 @@ To use the *interaction.sh* script, modify its variables as instructed in the co
 `source interaction.sh`  
 You can now deploy you contract by typing  
 `deploy`  
-followed by your contract's contructor arguments, if any.
+followed by your contract's contrusctor arguments, if any.
 
 Once your contract deployed, update the ADDRESS variable in the script and run again  
 `source interaction.sh`
