@@ -133,17 +133,17 @@ def generate_interaction_script(data):
                 for i, input in enumerate(data["constructor"]["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "str:${" + str(i) + "} "
+                        args_str += "\"str:${" + str(i + 1) + "}\" "
                     elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                        args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
-                        args_str += "${" + str(i) + "} "
+                        args_str += "${" + str(i + 1) + "} "
                     args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
         upgrade_str = "    erdpy contract upgrade ${ADDRESS} --bytecode output/" + contract_name + ".wasm --recall-nonce ${PRIVATE_KEY} --gas-limit=500000000 --proxy=${PROXY} --chain=${CHAIN_ID} --send "
         if (data["constructor"]["inputs"]):
             upgrade_str += "\\\n" + tab_str + tab_str + "--arguments "
-            for i in enumerate(data["constructor"]["inputs"]).len():
+            for i, input in enumerate(data["constructor"]["inputs"]):
                 upgrade_str += "${ARG_" + str(i) + "} "
             upgrade_str += "\n"
         upgrade_str += "\n"
@@ -163,11 +163,11 @@ def generate_interaction_script(data):
                 for i, input in enumerate(endpoint["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "str:${" + str(i) + "} "
+                        args_str += "\"str:${" + str(i + 1) + "}\" "
                     elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                        args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
-                        args_str += "${" + str(i) + "} "
+                        args_str += "${" + str(i + 1) + "} "
                     args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
             call_str = "    erdpy contract call ${ADDRESS} \\\n"
@@ -193,9 +193,9 @@ def generate_interaction_script(data):
                 for i, input in enumerate(endpoint["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "str:${" + str(i) + "} "
+                        args_str += "\"str:${" + str(i + 1) + "}\" "
                     elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                        args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
                         args_str += "${" + str(i) + "} "
                     args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
