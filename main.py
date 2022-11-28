@@ -202,7 +202,7 @@ def generate_interaction_script(data):
                 f.write(args_str)
             query_str = "    erdpy contract query ${ADDRESS} \\\n"
             query_str += tab_str + tab_str + "--function \"" + endpoint["name"] + "\" \\\n"
-            query_str += tab_str + tab_str + "--proxy=${PROXY} --chain=${CHAIN_ID} "
+            query_str += tab_str + tab_str + "--proxy=${PROXY} "
             if (endpoint["inputs"]):
                 query_str += "\\\n" + tab_str + tab_str + " --arguments "
                 for i, input in enumerate(endpoint["inputs"]):
