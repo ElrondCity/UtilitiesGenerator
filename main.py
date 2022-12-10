@@ -123,7 +123,7 @@ def generate_interaction_script(data):
             deploy_str += "\n"
         deploy_str += "\n"
         f.write(deploy_str)
-        f.write("    echo \"Deployed contract at the address written above.\"")
+        f.write("    echo \"Deployed contract at the address written above.\"\n")
         f.write("    echo \"Pleade update the ADDRESS variable in this script with the address of the deployed contract, then run 'source interaction.sh' to update the environment variables.\"\n")
         f.write("}\n\n")
 
