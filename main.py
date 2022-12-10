@@ -90,6 +90,8 @@ def generate_interaction_script(data):
         f.write("CHAIN_ID=D\n")
         f.write("\n")
 
+        tab_str = "    "
+
         # Deploy
         contract_name = data["buildInfo"]["contractCrate"]["name"]
 
@@ -149,8 +151,6 @@ def generate_interaction_script(data):
         upgrade_str += "\n"
         f.write(upgrade_str)
         f.write("}\n\n")
-
-        tab_str = "    "
 
         # Call endpoints
         f.write("# All contract endpoints are available as functions. Provide any arguments as needed (e.g transfer 12 TOKEN-123)\n\n")
