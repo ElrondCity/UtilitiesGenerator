@@ -117,7 +117,7 @@ def generate_interaction_script(data):
                 if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                     deploy_str += "str:${" + str(i) + "} "
                 elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                    deploy_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                    deploy_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                 else:
                     deploy_str += "${ARG_" + str(i) + "} "
             deploy_str += "\n"
