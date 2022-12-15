@@ -102,11 +102,11 @@ def generate_interaction_script(data):
                 for i, input in enumerate(data["constructor"]["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "str:${" + str(i) + "} "
+                        args_str += "str:${" + str(i + 1) + "} "
                     elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                        args_str += "$(echo \"scale=0; (${" + str(i) + "}*10^18)/1\" | bc -l) "
+                        args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
-                        args_str += "${" + str(i) + "} "
+                        args_str += "${" + str(i + 1) + "} "
                     args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
         f.write("    erdpy contract build\n")
@@ -114,11 +114,6 @@ def generate_interaction_script(data):
         if (data["constructor"]["inputs"]):
             deploy_str += "\\\n" + tab_str + tab_str + "--arguments "
             for i, input in enumerate(data["constructor"]["inputs"]):
-                if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                    deploy_str += "str:${" + str(i) + "} "
-                elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
-                    deploy_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
-                else:
                     deploy_str += "${ARG_" + str(i) + "} "
             deploy_str += "\n"
         deploy_str += "\n"
