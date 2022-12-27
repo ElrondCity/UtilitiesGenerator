@@ -103,7 +103,7 @@ def generate_interaction_script(data):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                         args_str += "str:${" + str(i + 1) + "} "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                    elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
                         args_str += "${" + str(i + 1) + "} "
@@ -131,7 +131,7 @@ def generate_interaction_script(data):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                         args_str += "\"str:${" + str(i + 1) + "}\" "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                    elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
                         args_str += "${" + str(i + 1) + "} "
@@ -159,7 +159,7 @@ def generate_interaction_script(data):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                         args_str += "\"str:${" + str(i + 1) + "}\" "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                    elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
                         args_str += "${" + str(i + 1) + "} "
@@ -189,7 +189,7 @@ def generate_interaction_script(data):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
                         args_str += "\"str:${" + str(i + 1) + "}\" "
-                    elif input["type"] == "BigUint" or input["type"] == "u64" or input["type"] == "u32" or input["type"] == "u16" or input["type"] == "u8":
+                    elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
                         args_str += "${" + str(i) + "} "
