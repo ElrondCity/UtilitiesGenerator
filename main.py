@@ -192,7 +192,7 @@ def generate_interaction_script(data):
                     elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
-                        args_str += "${" + str(i) + "} "
+                        args_str += "${" + str(i + 1) + "} "
                     args_str += " # " + str(i) + ": " + input["name"] + " (" + input["type"] + ")\n"
                 f.write(args_str)
             query_str = "    erdpy contract query ${ADDRESS} \\\n"
