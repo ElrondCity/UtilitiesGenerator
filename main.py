@@ -18,7 +18,10 @@ def generate_markdown(data):
         f.write("# " + data["name"])
         f.write('\n')
         if ("docs" in data):
-            f.write("#### " + data["docs"][0])
+            # Write the docs
+            for i in range(len(data["docs"])):
+                f.write(data["docs"][i])
+                f.write('\n')
         f.write('\n\n')
 
         # Write the endpoints
@@ -29,6 +32,10 @@ def generate_markdown(data):
         f.write('\n')
         for endpoint in data["endpoints"]:
             if "onlyOwner" in endpoint and endpoint["onlyOwner"]:
+                if ("docs" in endpoint):
+                    for i in range(len(endpoint["docs"])):
+                        f.write(endpoint["docs"][i])
+                        f.write('\n')
                 endpoint_str = "- **" + endpoint["name"] + "**("
                 for i, input in enumerate(endpoint["inputs"]):
                     endpoint_str += input["name"] + ": `" + input["type"] + "`"
@@ -45,6 +52,10 @@ def generate_markdown(data):
         f.write('\n')
         for endpoint in data["endpoints"]:
             if ("onlyOwner" not in endpoint or not endpoint["onlyOwner"]) and endpoint["mutability"] != "readonly":
+                if ("docs" in endpoint):
+                    for i in range(len(endpoint["docs"])):
+                        f.write(endpoint["docs"][i])
+                        f.write('\n')
                 endpoint_str = "- **" + endpoint["name"] + "**("
                 for i, input in enumerate(endpoint["inputs"]):
                     endpoint_str += input["name"] + ": `" + input["type"] + "`"
@@ -61,6 +72,10 @@ def generate_markdown(data):
         f.write('\n')
         for endpoint in data["endpoints"]:
             if endpoint["mutability"] == "readonly":
+                if ("docs" in endpoint):
+                    for i in range(len(endpoint["docs"])):
+                        f.write(endpoint["docs"][i])
+                        f.write('\n')
                 endpoint_str = "- **" + endpoint["name"] + "**("
                 for i, input in enumerate(endpoint["inputs"]):
                     endpoint_str += input["name"] + ": `" + input["type"] + "`"
