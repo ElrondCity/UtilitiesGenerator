@@ -17,6 +17,6 @@ Once your contract deployed, update the ADDRESS variable in the script and run a
 
 You can now call you contract's endpoint by typing  
 `endpoint_name argument1 argument2 ...`  
-BigUint arguments are automatically multiplied by 10^18, so you can type 0.01 to actually represent 0.01 tokens for example.
+BigUint arguments are automatically multiplied by 10^18, so you can type 0.01 to actually represent 0.01 tokens for example. If you use BigUint as arguments that don't represent token amounts, remember to tweak the script.
 
 Note: Payable endpoints are not yet handled by the script. For EGLD payable endpoints, you can simply add a --value argument to the call. For ESDT transfers, you'll need to use the ESDTTransfer function (see the official documentation of erdpy)
