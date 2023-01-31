@@ -117,7 +117,7 @@ def generate_interaction_script(data):
                 for i, input in enumerate(data["constructor"]["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "str:${" + str(i + 1) + "} "
+                        args_str += "0x$(echo -n $"+ str(i + 1) + " | xxd -p -u | tr -d '\\n') "
                     elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
@@ -145,7 +145,7 @@ def generate_interaction_script(data):
                 for i, input in enumerate(data["constructor"]["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "\"str:${" + str(i + 1) + "}\" "
+                        args_str += "0x$(echo -n $"+ str(i + 1) + " | xxd -p -u | tr -d '\\n') "
                     elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
@@ -173,7 +173,7 @@ def generate_interaction_script(data):
                 for i, input in enumerate(endpoint["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "\"str:${" + str(i + 1) + "}\" "
+                        args_str += "0x$(echo -n $"+ str(i + 1) + " | xxd -p -u | tr -d '\\n') "
                     elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
@@ -203,7 +203,7 @@ def generate_interaction_script(data):
                 for i, input in enumerate(endpoint["inputs"]):
                     args_str += "ARG_" + str(i) + "="
                     if input["type"] == "bytes" or input["type"] == "string" or input["type"] == "TokenIdentifier":
-                        args_str += "\"str:${" + str(i + 1) + "}\" "
+                        args_str += "0x$(echo -n $"+ str(i + 1) + " | xxd -p -u | tr -d '\\n') "
                     elif input["type"] == "BigUint":
                         args_str += "$(echo \"scale=0; (${" + str(i + 1) + "}*10^18)/1\" | bc -l) "
                     else:
@@ -247,7 +247,7 @@ def main():
     generate_markdown(data)
     generate_interaction_script(data)
 
-    
+
 
 if __name__ == "__main__":
     main()
