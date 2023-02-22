@@ -12,85 +12,61 @@ import json
 import os
 import sys
 
+def write_docs(f, data):
+    if "docs" in data:
+        for doc in data["docs"]:
+            f.write(doc)
+            f.write("\n")
+
+def write_endpoint(f, endpoint):
+    endpoint_str = "- **" + endpoint["name"] + "**("
+    for i, input in enumerate(endpoint["inputs"]):
+        endpoint_str += input["name"] + ": `" + input["type"] + "`"
+        if i != len(endpoint["inputs"]) - 1:
+            endpoint_str += ", "
+    endpoint_str += ")"
+    if len(endpoint["outputs"]) > 0:
+        endpoint_str += " -> `"
+        for i, output in enumerate(endpoint["outputs"]):
+            endpoint_str += output["type"]
+            if i != len(endpoint["outputs"]) - 1:
+                endpoint_str += ", "
+        endpoint_str += "`  "
+    f.write(endpoint_str)
+    f.write("\n")
+    write_docs(f, endpoint)
+
+def write_endpoints(f, data, is_only_owner, is_readonly):
+    for endpoint in data["endpoints"]:
+        if ("onlyOwner" in endpoint and endpoint["onlyOwner"]) == is_only_owner and endpoint["mutability"] == ("readonly" if is_readonly else "mutable"):
+            write_endpoint(f, endpoint)
+
+
 def generate_markdown(data):
-    # Create the markdown file
     with open("contract_doc.md", "w") as f:
-        f.write("# " + data["name"])
-        f.write('\n')
-        if ("docs" in data):
-            # Write the docs
-            for i in range(len(data["docs"])):
-                f.write(data["docs"][i])
-                f.write('\n')
-        f.write('\n\n')
+        # Write contract name
+        f.write("# " + data["name"] + "\n\n")
 
-        # Write the endpoints
-        f.write(" ## Endpoints ")
-        f.write('\n')
-        # Start with onlyOwner endpoints
-        f.write(" ### onlyOwner ")
-        f.write('\n')
-        for endpoint in data["endpoints"]:
-            if "onlyOwner" in endpoint and endpoint["onlyOwner"]:
-                if ("docs" in endpoint):
-                    for i in range(len(endpoint["docs"])):
-                        f.write(endpoint["docs"][i])
-                        f.write('\n')
-                endpoint_str = "- **" + endpoint["name"] + "**("
-                for i, input in enumerate(endpoint["inputs"]):
-                    endpoint_str += input["name"] + ": `" + input["type"] + "`"
-                    if i != len(endpoint["inputs"]) - 1:
-                        endpoint_str += ", "
-                endpoint_str += ")"
-                f.write(endpoint_str)
-                f.write('\n')
+        # Write docs
+        write_docs(f, data)
 
-        f.write('\n')
+        # Write endpoints
+        f.write("## Endpoints\n\n")
 
-        # Then write the public and not readonly endpoints
-        f.write(" ### Public ")
-        f.write('\n')
-        for endpoint in data["endpoints"]:
-            if ("onlyOwner" not in endpoint or not endpoint["onlyOwner"]) and endpoint["mutability"] != "readonly":
-                if ("docs" in endpoint):
-                    for i in range(len(endpoint["docs"])):
-                        f.write(endpoint["docs"][i])
-                        f.write('\n')
-                endpoint_str = "- **" + endpoint["name"] + "**("
-                for i, input in enumerate(endpoint["inputs"]):
-                    endpoint_str += input["name"] + ": `" + input["type"] + "`"
-                    if i != len(endpoint["inputs"]) - 1:
-                        endpoint_str += ", "
-                endpoint_str += ")"
-                f.write(endpoint_str)
-                f.write('\n')
+        # Write onlyOwner endpoints
+        f.write("### onlyOwner\n")
+        write_endpoints(f, data, True, False)
+        f.write("\n")
 
-        f.write('\n')
+        # Write public and writeable endpoints
+        f.write("### Public\n")
+        write_endpoints(f, data, False, False)
+        f.write("\n")
 
-        # Then write the readonly endpoints
-        f.write(" ### Readonly ")
-        f.write('\n')
-        for endpoint in data["endpoints"]:
-            if endpoint["mutability"] == "readonly":
-                if ("docs" in endpoint):
-                    for i in range(len(endpoint["docs"])):
-                        f.write(endpoint["docs"][i])
-                        f.write('\n')
-                endpoint_str = "- **" + endpoint["name"] + "**("
-                for i, input in enumerate(endpoint["inputs"]):
-                    endpoint_str += input["name"] + ": `" + input["type"] + "`"
-                    if i != len(endpoint["inputs"]) - 1:
-                        endpoint_str += ", "
-                endpoint_str += ")"
-                if len(endpoint["outputs"]) > 0:
-                    endpoint_str += " -> `"
-                    for i, output in enumerate(endpoint["outputs"]):
-                        endpoint_str += output["type"]
-                        if i != len(endpoint["outputs"]) - 1:
-                            endpoint_str += ", "
-                    endpoint_str += "`"
-                f.write(endpoint_str)
-                f.write('\n')
+        # Write readonly endpoints
+        f.write("### Readonly\n")
+        write_endpoints(f, data, False, True)
+        f.write("\n")
 
 def generate_interaction_script(data):
     # Create the interaction script
